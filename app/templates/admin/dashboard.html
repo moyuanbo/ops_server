@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>管理员控制台</h1>
+    <span class="text-muted">欢迎回来，{{ current_user.real_name }}！</span>
+</div>
+
+<!-- 统计卡片区域 -->
+<div class="row mb-6">
+    <!-- 总用户数卡片 -->
+    <div class="col-md-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">总用户数</h5>
+                <h2 class="display-4">{{ total_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.users') }}" class="text-white">查看所有用户</a>
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员数卡片 -->
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">管理员数</h5>
+                <h2 class="display-4">{{ admin_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.users') }}" class="text-white">管理管理员</a>
+                <i class="fas fa-user-shield"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 普通用户数卡片 -->
+    <div class="col-md-4">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">普通用户数</h5>
+                <h2 class="display-4">{{ normal_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.users') }}" class="text-white">管理普通用户</a>
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快速操作区域 -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="btn-group mr-3 mb-3">
+                    <a href="{{ url_for('admin.create_user') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> 创建新用户
+                    </a>
+                </div>
+                <div class="btn-group mr-3 mb-3">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-info">
+                        <i class="fas fa-list"></i> 查看用户列表
+                    </a>
+                </div>
+                <div class="btn-group mr-3 mb-3">
+                    <a href="{{ url_for('admin.user_profile') }}" class="btn btn-warning">
+                        <i class="fas fa-user-circle"></i> 个人中心
+                    </a>
+                </div>
+                <div class="btn-group mb-3">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> 退出登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- 引入Font Awesome图标 -->
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}

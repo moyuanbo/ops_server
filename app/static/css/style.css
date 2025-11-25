@@ -1,0 +1,242 @@
+/* ========================
+   全局样式
+   ======================== */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+a {
+    color: #007bff;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+/* ========================
+   导航栏样式
+   ======================== */
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #fff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border-radius: 4px;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================
+   卡片组件样式
+   ======================== */
+
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 1rem 1.25rem;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* ========================
+   表单样式
+   ======================== */
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+/* ========================
+   按钮样式
+   ======================== */
+
+.btn {
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+/* ========================
+   表格样式
+   ======================== */
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+    padding: 0.75rem 1rem;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 500;
+    color: #212529;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ========================
+   页面标题和间距
+   ======================== */
+
+h1, h2, h3, h4, h5, h6 {
+    color: #212529;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* ========================
+   响应式样式调整
+   ======================== */
+
+@media (max-width: 768px) {
+    .navbar-dark .navbar-nav .nav-link {
+        margin-left: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .btn-group {
+        display: block;
+    }
+}
+
+/* ========================
+   自定义组件
+   ======================== */
+
+/* Dashboard Stats Cards */
+.card-stat {
+    color: white;
+}
+
+.card-stat .card-body {
+    padding: 1.5rem;
+}
+
+.card-stat .display-4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.card-stat .card-footer {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-top: none;
+}
+
+.card-stat .card-footer a {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Alert */
+.alert {
+    border-radius: 6px;
+    border: none;
+}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">编辑用户：{{ user.username }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.edit_user', user_id=user.id) }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        {{ form.username.label(class="form-control-label") }}
+                        <!-- 用户名只读 -->
+                        <input type="text" class="form-control" value="{{ user.username }}" readonly disabled>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.real_name.label(class="form-control-label") }}
+                        {% if form.real_name.errors %}
+                            {{ form.real_name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.real_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.real_name(class="form-control", placeholder="请输入中文姓名") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.email.label(class="form-control-label") }}
+                        {% if form.email.errors %}
+                            {{ form.email(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.email(class="form-control", placeholder="请输入邮箱") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.password.label(class="form-control-label") }}
+                        <small class="form-text text-muted">不填写则保持原密码</small>
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control", placeholder="请输入新密码（至少6位）") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.password2.label(class="form-control-label") }}
+                        {% if form.password2.errors %}
+                            {{ form.password2(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password2.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password2(class="form-control", placeholder="请重复新密码") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-check">
+                        <!-- admin用户不可取消管理员权限 -->
+                        {% if user.username == 'admin' %}
+                            {{ form.is_admin(class="form-check-input", checked=True, onclick="return false;") }}
+                            <label class="form-check-label" for="is_admin">管理员（不可修改）</label>
+                        {% else %}
+                            {{ form.is_admin(class="form-check-input") }}
+                            {{ form.is_admin.label(class="form-check-label") }}
+                        {% endif %}
+                    </div>
+                    <br>
+
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary btn-block", value="保存修改") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
