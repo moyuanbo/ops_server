@@ -1,83 +1,110 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>用户管理</h1>
-    <a href="{{ url_for('admin.create_user') }}" class="btn btn-primary">创建新用户</a>
-</div>
-
-<div class="card">
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">用户列表</h5>
+        <!-- 刷新按钮（异步加载） -->
+        <button id="refreshUsers" class="btn btn-sm btn-primary">
+            <i class="fas fa-sync-alt"></i> 刷新列表
+        </button>
+    </div>
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>登录用户名</th>
-                        <th>中文姓名</th>
-                        <th>邮箱</th>
-                        <th>是否管理员</th>
-                        <th>创建时间</th>
-                        <th>最后登录</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.username }}</td>  <!-- 登录用户名 -->
-                        <td>{{ user.real_name }}</td> <!-- 中文姓名 -->
-                        <td>{{ user.email }}</td>
-                        <td>
-                            {% if user.is_admin %}
-                                <span class="badge badge-success">是</span>
-                            {% else %}
-                                <span class="badge badge-secondary">否</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>
-                            {% if user.last_login %}
-                                {{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}
-                            {% else %}
-                                从未登录
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">编辑</a>
-                                {% if user.username != 'admin' %}
-                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal{{ user.id }}">删除</button>
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Delete Confirmation Modal -->
-                    <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ user.id }}" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel{{ user.id }}">Confirm Delete</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete user <strong>{{ user.username }}</strong>? This action cannot be undone.
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST">
-                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- 异步加载的用户表格 -->
+        <div id="usersTable">
+            <div class="text-center py-3">
+                <span class="loading"></span> 加载中...
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// 页面加载时自动刷新用户列表
+$(document).ready(function() {
+    refreshUserList();
+});
+
+// 刷新按钮点击事件
+$('#refreshUsers').click(function() {
+    refreshUserList();
+});
+
+// 异步加载用户列表
+function refreshUserList() {
+    const $tableContainer = $('#usersTable');
+    $tableContainer.html('<div class="text-center py-3"><span class="loading"></span> 加载中...</div>');
+
+    // 调用API（带CSRF Token）
+    $.ajax({
+        url: '{{ url_for("api.get_users") }}',
+        type: 'GET',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token() }}'  // CSRF保护
+        },
+        success: function(users) {
+            if (users.length === 0) {
+                $tableContainer.html(`
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <h5>暂无用户</h5>
+                        <p>点击"创建用户"添加新用户</p>
+                    </div>
+                `);
+                return;
+            }
+
+            // 生成表格HTML
+            let tableHtml = `
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>用户名</th>
+                            <th>真实姓名</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>创建时间</th>
+                            <th>最后登录</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                const roleLabel = user.is_admin 
+                    ? '<span class="badge bg-primary admin-only">管理员</span>' 
+                    : '<span class="badge bg-secondary">普通用户</span>';
+                
+                tableHtml += `
+                    <tr>
+                        <td>${user.username}</td>
+                        <td>${user.real_name}</td>
+                        <td>${user.email}</td>
+                        <td>${roleLabel}</td>
+                        <td>${new Date(user.created_at).toLocaleString()}</td>
+                        <td>${user.last_login ? new Date(user.last_login).toLocaleString() : '未登录'}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+
+            $tableContainer.html(tableHtml);
+        },
+        error: function(xhr, status, error) {
+            $tableContainer.html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> 加载失败：${xhr.responseJSON?.error || '网络错误'}
+                </div>
+            `);
+        }
+    });
+}
+</script>
 {% endblock %}

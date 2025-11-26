@@ -14,7 +14,7 @@ class UserForm(FlaskForm):
         DataRequired('登录用户名不能为空'),
         Length(min=4, max=64, message='用户名长度必须在4-64位之间')
     ])
-    real_name = StringField('中文姓名', validators=[  # 新增：中文姓名字段
+    real_name = StringField('中文姓名', validators=[  # 中文姓名字段
         DataRequired('中文姓名不能为空'),
         Length(min=2, max=64, message='中文姓名长度必须在2-64位之间')
     ])

@@ -3,51 +3,49 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">用户登录</h4>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">管理员登录</h4>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('auth.login') }}">
-                    {{ form.hidden_tag() }}
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="form-group">
-                        {{ form.username.label(class="form-control-label") }}
+                    <!-- 用户名 -->
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
                         {% if form.username.errors %}
-                            {{ form.username(class="form-control is-invalid") }}
                             <div class="invalid-feedback">
                                 {% for error in form.username.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
-                        {% else %}
-                            {{ form.username(class="form-control", placeholder="请输入用户名") }}
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        {{ form.password.label(class="form-control-label") }}
+                    <!-- 密码 -->
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
                         {% if form.password.errors %}
-                            {{ form.password(class="form-control is-invalid") }}
                             <div class="invalid-feedback">
                                 {% for error in form.password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
-                        {% else %}
-                            {{ form.password(class="form-control", placeholder="请输入密码") }}
                         {% endif %}
                     </div>
 
-                    <div class="form-check">
+                    <!-- 记住我 -->
+                    <div class="mb-3 form-check">
                         {{ form.remember_me(class="form-check-input") }}
                         {{ form.remember_me.label(class="form-check-label") }}
                     </div>
-                    <br>
 
-                    <div class="form-group">
-                        {{ form.submit(class="btn btn-primary btn-block", value="登录") }}
-                    </div>
+                    <!-- 提交按钮 -->
+                    <button type="submit" class="btn btn-primary w-100">登录</button>
                 </form>
             </div>
         </div>

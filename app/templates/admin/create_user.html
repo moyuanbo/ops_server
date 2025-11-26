@@ -2,93 +2,95 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">创建新用户</h4>
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">创建新用户</h4>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('admin.create_user') }}">
-                    {{ form.hidden_tag() }}
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="form-group">
-                        {{ form.username.label(class="form-control-label") }}
-                        {% if form.username.errors %}
-                            {{ form.username(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.username.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
+                    <div class="row g-3">
+                        <!-- 用户名 -->
+                        <div class="col-md-6">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 真实姓名 -->
+                        <div class="col-md-6">
+                            {{ form.real_name.label(class="form-label") }}
+                            {{ form.real_name(class="form-control" + (" is-invalid" if form.real_name.errors else "")) }}
+                            {% if form.real_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.real_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 邮箱 -->
+                        <div class="col-md-12">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 密码 -->
+                        <div class="col-md-6">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 确认密码 -->
+                        <div class="col-md-6">
+                            {{ form.password2.label(class="form-label") }}
+                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else "")) }}
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password2.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 管理员权限 -->
+                        <div class="col-md-12">
+                            <div class="form-check form-switch">
+                                {{ form.is_admin(class="form-check-input", id="isAdmin") }}
+                                {{ form.is_admin.label(class="form-check-label", for="isAdmin") }}
                             </div>
-                        {% else %}
-                            {{ form.username(class="form-control", placeholder="请输入用户名") }}
-                        {% endif %}
-                    </div>
+                        </div>
 
-                    <div class="form-group">
-                        {{ form.real_name.label(class="form-control-label") }}
-                        {% if form.real_name.errors %}
-                            {{ form.real_name(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.real_name.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.real_name(class="form-control", placeholder="请输入中文姓名") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.email.label(class="form-control-label") }}
-                        {% if form.email.errors %}
-                            {{ form.email(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.email.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.email(class="form-control", placeholder="请输入邮箱") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.password.label(class="form-control-label") }}
-                        {% if form.password.errors %}
-                            {{ form.password(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.password(class="form-control", placeholder="请输入密码（至少6位）") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.password2.label(class="form-control-label") }}
-                        {% if form.password2.errors %}
-                            {{ form.password2(class="form-control is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.password2.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.password2(class="form-control", placeholder="请重复密码") }}
-                        {% endif %}
-                    </div>
-
-                    <div class="form-check">
-                        {{ form.is_admin(class="form-check-input") }}
-                        {{ form.is_admin.label(class="form-check-label") }}
-                    </div>
-                    <br>
-
-                    <div class="form-group">
-                        {{ form.submit(class="btn btn-primary btn-block", value="创建用户") }}
+                        <!-- 提交按钮 -->
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">创建用户</button>
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary ms-2">取消</a>
+                        </div>
                     </div>
                 </form>
             </div>

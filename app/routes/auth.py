@@ -1,55 +1,45 @@
 # app/routes/auth.py
-
+import os
+from datetime import timedelta
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from flask_login import login_user, logout_user, login_required
-# 1. 从 urllib.parse 导入 urlparse
-from urllib.parse import urlparse
-from datetime import datetime, timezone
-from app import db
+from flask_login import login_user, logout_user, login_required, current_user
+
+from app.extensions import db, limiter
 from app.models.user import User
 from app.routes.forms import LoginForm
 
+
+# 创建蓝图（limiter已在应用工厂初始化，直接使用装饰器）
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")  # 登录限流：每分钟5次
 def login():
-    # 3. 实例化 LoginForm
+    if current_user.is_authenticated:
+        return redirect(url_for('admin.users'))
+
     form = LoginForm()
-
-    # 4. 使用表单的 validate_on_submit() 方法
     if form.validate_on_submit():
-        # 5. 从表单对象中获取数据
-        username = form.username.data
-        password = form.password.data
-        remember_me = form.remember_me.data
-
-        user = User.query.filter_by(username=username).first()
-
-        if not user or not user.check_password(password):
-            flash('用户名或密码错误')
-            # 6. 验证失败时，重定向回登录页
+        user = User.query.filter_by(username=form.username.data).first()
+        if not user or not user.check_password(form.password.data):
+            flash('无效的用户名或密码')
             return redirect(url_for('auth.login'))
 
-        # 7. 使用表单中的 remember_me 数据
-        login_user(user, remember=remember_me)
-
-        next_page = request.args.get('next')
-        # 8. 使用新导入的 urlparse 函数
-        if not next_page or urlparse(next_page).netloc != '':
-            if user.is_admin:
-                next_page = url_for('admin.dashboard')
-            else:
-                next_page = url_for('admin.user_profile')
-
-        # 更新最后登录时间
-        user.last_login = datetime.now(timezone.utc)
+        # 更新登录时间
+        user.update_last_login()
         db.session.commit()
 
-        return redirect(next_page)
+        # 登录（记住我：1小时有效期）
+        timeout = int(os.environ.get('SESSION_TIMEOUT'))
+        login_user(user, remember=form.remember_me.data, duration=timedelta(hours=timeout))
+        print(timeout)
 
-    # 9. GET 请求时，渲染模板并传入表单对象
-    return render_template('auth/login.html', title='Sign In', form=form)
+        # 处理跳转
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('admin.users'))
+
+    return render_template('auth/login.html', title='登录', form=form)
 
 
 @auth.route('/logout')

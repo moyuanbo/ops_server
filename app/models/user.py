@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import db, login_manager
+from app.extensions import db, login_manager
 
 
 class User(UserMixin, db.Model):
@@ -13,14 +13,24 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     last_login = db.Column(db.DateTime)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        """增强密码哈希策略"""
+        # 使用更强的哈希参数
+        self.password_hash = generate_password_hash(
+            password,
+            method='pbkdf2:sha256:100000',  # 100,000次迭代
+            salt_length=16
+        )
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def update_last_login(self):
+        """更新最后登录时间"""
+        self.last_login = datetime.now(UTC)
 
     def __repr__(self):
         return f'<User {self.username} ({self.real_name})>'

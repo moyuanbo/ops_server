@@ -4,9 +4,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from functools import wraps
 
-from app import db
+from app.extensions import db
 from app.models.user import User
-from app.routes.forms import UserForm  # 导入表单类
+from app.routes.forms import UserForm
+from app.services.user_service import UserService  # 导入服务层
 
 admin = Blueprint('admin', __name__)
 
@@ -57,30 +58,17 @@ def users():
 def create_user():
     form = UserForm()
     if form.validate_on_submit():
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-        is_admin = form.is_admin.data
+        # 使用服务层创建用户
+        if UserService.create_user(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data,
+                real_name=form.real_name.data,
+                is_admin=form.is_admin.data
+        ):
+            return redirect(url_for('admin.users'))
 
-        if User.query.filter_by(username=username).first():
-            # 用户名已存在
-            flash('该用户名已被使用')
-            return redirect(url_for('admin.create_user'))
-
-        if User.query.filter_by(email=email).first():
-            # 邮箱已存在
-            flash('该邮箱已被注册')
-            return redirect(url_for('admin.create_user'))
-
-        new_user = User(username=username, email=email, is_admin=is_admin)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        # 创建成功
-        flash('用户创建成功')
-        return redirect(url_for('admin.users'))
-
-    return render_template('admin/create_user.html', title='Create User', form=form)
+    return render_template('admin/create_user.html', title='创建用户', form=form)
 
 
 @admin.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
