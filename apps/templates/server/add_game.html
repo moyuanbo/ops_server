@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<!-- 引入服务器管理通用样式 -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/server_manager.css') }}">
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+<!-- 引入jQuery（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<!-- 引入Bootstrap JS（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<!-- 引入服务器管理通用JS -->
+<script src="{{ url_for('static', filename='js/server_manager.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0 text-primary">添加区服</h2>
+        <a href="{{ url_for('game_management.entity_list') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 提示信息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="server-form-container mb-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- 表单卡片 -->
+    <div class="server-form-container">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <!-- 归属渠道 -->
+                    <div class="form-group row">
+                        <label for="channel_name">归属渠道 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="channel_name" name="channel_name" required>
+                    </div>
+
+                    <!-- 区服类型 -->
+                    <div class="form-group row">
+                        <label for="server_type">区服类型 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="server_type" name="server_type" required>
+                    </div>
+
+                    <!-- 区服目录 -->
+                    <div class="form-group row">
+                        <label for="server_dir">区服目录 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="server_dir" name="server_dir" required>
+                    </div>
+
+                    <!-- 区服number -->
+                    <div class="form-group row">
+                        <label for="game_nu">区服number <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="game_nu" name="game_nu" required>
+                    </div>
+
+                    <!-- 外网IP -->
+                    <div class="form-group row">
+                        <label for="external_ip">外网IP <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="external_ip" name="external_ip" required>
+                    </div>
+
+                    <!-- 内网IP -->
+                    <div class="form-group row">
+                        <label for="intranet_ip">内网IP <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="intranet_ip" name="intranet_ip" required>
+                    </div>
+
+                    <!-- 数据库IP地址 -->
+                    <div class="form-group row">
+                        <label for="server_db_ip">数据库IP <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="server_db_ip" name="server_db_ip" required>
+                    </div>
+
+                    <!-- 游戏服数据库库名 -->
+                    <div class="form-group row">
+                        <label for="server_db_name">游戏服库名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="server_db_name" name="server_db_name" required>
+                    </div>
+
+                    <!-- 开服状态 -->
+                    <div class="form-group row">
+                        <label for="open_status">开服状态 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="open_status" name="open_status" required>
+                            <option value="0">未开服</option>
+                            <option value="1">已开服</option>
+                        </select>
+                    </div>
+
+                    <!-- 状态类型 -->
+                    <div class="form-group row">
+                        <label for="game_status">状态类型 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="game_status" name="game_status" required>
+                            <option value="0">正式服</option>
+                            <option value="1">测试服</option>
+                            <option value="2">已删除</option>
+                            <option value="3">未定义</option>
+                        </select>
+                    </div>
+
+                    <!-- 按钮区域 -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">保存区服信息</button>
+                        <a href="{{ url_for('game_management.entity_list') }}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

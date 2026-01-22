@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}创建用户{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">创建新用户</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <!-- 用户名 -->
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label fw-bold") }}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="输入用户名") }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">用户名长度4-64个字符，只能包含字母、数字和下划线</div>
+                        </div>
+
+                        <!-- 真实姓名 -->
+                        <div class="mb-3">
+                            {{ form.real_name.label(class="form-label fw-bold") }}
+                            {{ form.real_name(class="form-control" + (" is-invalid" if form.real_name.errors else ""), placeholder="输入真实姓名") }}
+                            {% for error in form.real_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- 邮箱 -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label fw-bold") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="输入邮箱地址") }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- 管理员权限 -->
+                        <div class="mb-3 form-check">
+                            {{ form.is_admin(class="form-check-input") }}
+                            {{ form.is_admin.label(class="form-check-label") }}
+                        </div>
+
+                        <!-- 密码 -->
+                        <div class="mb-3">
+                                {{ form.password.label(class="form-label fw-bold") }}
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="留空将自动生成密码") }}
+                                {% for error in form.password.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>  <!-- 这里会显示具体错误，如"密码强度不够：需包含至少一个大写字母，需包含特殊字符" -->
+                                {% endfor %}
+
+                            <!-- 密码强度提示 -->
+                            <div class="mt-2">
+                                <div class="progress" style="height: 5px;">
+                                    <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div id="password-feedback" class="small mt-1"></div>
+                            </div>
+
+                            <!-- 密码要求说明 -->
+                            <div class="mt-2 text-muted small">
+                                <p class="mb-1">密码要求：</p>
+                                <ul class="mb-0">
+                                    <li>至少8个字符</li>
+                                    <li>包含大写字母</li>
+                                    <li>包含小写字母</li>
+                                    <li>包含数字</li>
+                                    <li>包含特殊字符 (!@#$%^&* 等)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 确认密码 -->
+                        <div class="mb-3">
+                            {{ form.password2.label(class="form-label fw-bold") }}
+                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else ""), placeholder="再次输入密码") }}
+                            {% for error in form.password2.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="mb-3 d-flex justify-content-between">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('admin.user_list') }}" class="btn btn-secondary">取消</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}  <!-- 先加载base.html中的jQuery、Bootstrap、侧边栏JS -->
+    <!-- 密码强度检测脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    const strengthBar = document.getElementById('password-strength');
+                    const feedback = document.getElementById('password-feedback');
+
+                    // 如果密码为空，清空提示
+                    if (!password) {
+                        strengthBar.style.width = '0%';
+                        feedback.textContent = '';
+                        return;
+                    }
+
+                    let strength = 0;
+                    let messages = [];
+
+                    // 检查长度
+                    if (password.length >= 8) {
+                        strength += 20;
+                    } else {
+                        messages.push('长度至少8位');
+                    }
+
+                    // 检查大写字母
+                    if (/[A-Z]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少大写字母');
+                    }
+
+                    // 检查小写字母
+                    if (/[a-z]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少小写字母');
+                    }
+
+                    // 检查数字
+                    if (/[0-9]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少数字');
+                    }
+
+                    // 检查特殊字符
+                    if (/[^A-Za-z0-9]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少特殊字符');
+                    }
+
+                    // 更新进度条
+                    strengthBar.style.width = strength + '%';
+
+                    // 设置颜色和提示
+                    if (strength < 40) {
+                        strengthBar.className = 'progress-bar bg-danger';
+                        feedback.textContent = '密码强度：弱';
+                        feedback.className = 'small mt-1 text-danger';
+                    } else if (strength < 80) {
+                        strengthBar.className = 'progress-bar bg-warning';
+                        feedback.textContent = '密码强度：中';
+                        feedback.className = 'small mt-1 text-warning';
+                    } else {
+                        strengthBar.className = 'progress-bar bg-success';
+                        feedback.textContent = '密码强度：强';
+                        feedback.className = 'small mt-1 text-success';
+                    }
+
+                    // 显示缺失项
+                    if (strength < 100) {
+                        feedback.textContent += ' - ' + messages.join(', ');
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

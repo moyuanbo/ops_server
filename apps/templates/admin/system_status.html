@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>系统状态监控</h1>
+    <button id="refreshBtn" class="btn btn-outline-primary">
+        <i class="fas fa-sync-alt"></i> 刷新状态
+    </button>
+</div>
+
+<!-- 状态卡片区域 -->
+<div class="row mb-6">
+    <!-- 数据库连接状态 -->
+    <div class="col-md-4">
+        <div class="card h-100" id="dbStatusCard">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-database"></i> 数据库状态
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">加载中...</p>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">加载中...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 服务器时间 -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock"></i> 服务器时间
+                </h5>
+            </div>
+            <div class="card-body">
+                <h3 class="display-5" id="serverTime"></h3>
+                <p class="text-muted">最后同步: <span id="timeSync"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系统状态 -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-server"></i> 应用状态
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">应用运行中</p>
+                <p class="text-muted">版本: {{ config.get('APP_VERSION', '1.0.0') }}</p>
+                <p class="text-muted">环境: {{ '开发环境' if config['DEBUG'] else '生产环境' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 详细信息表格 -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">数据库连接池详情</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="dbPoolTable">
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="text-center">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}  <!-- 先加载base.html中的jQuery、Bootstrap、侧边栏JS -->
+    <script>
+        // 页面加载时获取状态数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDbStatus();
+            updateServerTime();
+            // 定时刷新
+            setInterval(updateServerTime, 1000);
+            setInterval(loadDbStatus, 30000); // 每30秒刷新数据库状态
+        });
+
+        // 刷新按钮事件
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            loadDbStatus();
+            updateServerTime();
+        });
+
+        // 获取数据库状态
+        function loadDbStatus() {
+            fetch('/api/system/db/status')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应异常');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        updateDbStatusCard(data.data);
+                        updateDbPoolTable(data.data.connection_pool);
+                    } else {
+                        showError('数据库状态获取失败: ' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    showError('获取数据失败: ' + error.message);
+                });
+        }
+
+        // 更新数据库状态卡片
+        function updateDbStatusCard(data) {
+            const cardBody = document.querySelector('#dbStatusCard .card-body');
+            const statusClass = data.connection_ok ? 'text-success' : 'text-danger';
+            const statusText = data.connection_ok ? '连接正常' : '连接失败';
+            const statusIcon = data.connection_ok ? 'check-circle' : 'exclamation-circle';
+
+            cardBody.innerHTML = `
+                <p class="card-text ${statusClass}">
+                    <i class="fas fa-${statusIcon}"></i> ${statusText}
+                </p>
+                <p class="card-text">数据库类型: ${data.database_url}</p>
+                <p class="text-muted">最后检查: ${new Date().toLocaleString()}</p>
+            `;
+        }
+
+        // 更新连接池详情表格
+        function updateDbPoolTable(poolData) {
+            const tableBody = document.querySelector('#dbPoolTable tbody');
+            let html = '';
+
+            // 格式化连接池数据
+            const poolInfo = {
+                '总连接数': poolData.total,
+                '已使用连接': poolData.used,
+                '空闲连接': poolData.idle,
+                '等待连接数': poolData.overflow
+            };
+
+            for (const [key, value] of Object.entries(poolInfo)) {
+                html += `
+                    <tr>
+                        <td>${key}</td>
+                        <td>${value}</td>
+                    </tr>
+                `;
+            }
+
+            tableBody.innerHTML = html;
+        }
+
+        // 更新服务器时间
+        function updateServerTime() {
+            const now = new Date();
+            document.getElementById('serverTime').textContent = now.toLocaleString();
+            document.getElementById('timeSync').textContent = now.toLocaleTimeString();
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const cardBody = document.querySelector('#dbStatusCard .card-body');
+            cardBody.innerHTML = `
+                <p class="card-text text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> ${message}
+                </p>
+            `;
+        }
+    </script>
+{% endblock %}

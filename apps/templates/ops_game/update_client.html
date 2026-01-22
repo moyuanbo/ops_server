@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/update_client.css') }}">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="update-client-container">
+    <div class="update-card">
+        <h2 class="update-card__title">前端代码更新</h2>
+        <div class="update-card__operate">
+            <!-- 仅保留语义化标签，样式全部移到CSS文件 -->
+            <div class="select-wrapper">
+                <label for="channelSelect" class="select-label">更新渠道：</label>
+                <select id="channelSelect" class="update-select">
+                    <option value="">请选择更新渠道</option>
+                    <option value="Wechat">微信</option>
+                    <option value="indexBytedance">抖音</option>
+                    <option value="indexBytedanceGs">抖音GS</option>
+                    <option value="indexWechatGs">微信GS</option>
+                    <option value="indexIos">IOS正式</option>
+                    <option value="indexIos_tishen">ios提审</option>
+                    <option value="ALL">全部</option>
+                </select>
+            </div>
+            <button id="updateBtn" class="update-btn">
+                <i class="fas fa-play"></i> 执行前端更新
+            </button>
+        </div>
+        <div id="updateStatus" class="update-card__status">
+            就绪状态，选择更新渠道后点击按钮执行更新
+        </div>
+        <div id="logContainer" class="update-card__log"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/update_client.js') }}"></script>
+{% endblock %}

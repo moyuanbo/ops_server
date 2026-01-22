@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<!-- 引入服务器管理通用样式 -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/server_manager.css') }}">
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+<!-- 引入jQuery（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<!-- 引入Bootstrap JS（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<!-- 引入服务器管理通用JS -->
+<script src="{{ url_for('static', filename='js/server_manager.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0 text-primary">修改渠道</h2>
+        <a href="{{ url_for('channel_management.entity_list') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 提示信息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="server-form-container mb-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- 表单卡片 -->
+    <div class="server-form-container">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    <!-- 添加CSRF令牌字段 -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- 主机名 -->
+                    <div class="form-group row">
+                        <label for="channel_name">渠道名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="channel_name" name="channel_name" value="{{ channel.channel_name }}" required>
+                    </div>
+
+                    <!-- auto跳转脚本的显示信息 -->
+                    <div class="form-group row">
+                        <label for="annotation">显示信息 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="annotation" name="annotation" value="{{ channel.annotation }}" required>
+                    </div>
+
+                    <!-- 别名 -->
+                    <div class="form-group row">
+                        <label for="alias_name">别名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="alias_name" name="alias_name" value="{{ channel.alias_name }}" required>
+                    </div>
+
+                    <!-- 区服初始ID -->
+                    <div class="form-group row">
+                        <label for="initial_id">区服初始ID <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="initial_id" name="initial_id" value="{{ channel.initial_id }}" required>
+                    </div>
+
+                    <!-- 对于运维机来说，是否局域网 -->
+                    <div class="form-group row">
+                        <label for="external_switch">局域网 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="external_switch" name="external_switch" required>
+                            <option value="0" {% if channel.external_switch == 1 %}selected{% endif %}>内网</option>
+                            <option value="1" {% if channel.external_switch == 2 %}selected{% endif %}>外网</option>
+                        </select>
+                    </div>
+
+                    <!-- 按钮区域 -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> 更新渠道信息
+                        </button>
+                        <a href="{{ url_for('channel_management.entity_list') }}" class="btn btn-secondary">
+                            <i class="fa fa-times"></i> 取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

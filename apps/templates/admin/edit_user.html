@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">编辑用户：{{ user.username }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.edit_user', user_id=user.id) }}">
+                    {{ form.hidden_tag() }}
+
+                    <!-- 用户名（只读） -->
+                    <div class="form-group">
+                        {{ form.username.label(class="form-control-label") }}
+                        <input type="text" class="form-control" value="{{ user.username }}" readonly disabled>
+                    </div>
+
+                    <!-- 真实姓名 -->
+                    <div class="form-group">
+                        {{ form.real_name.label(class="form-control-label") }}
+                        {% if form.real_name.errors %}
+                            {{ form.real_name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.real_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.real_name(class="form-control", placeholder="请输入中文姓名") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- 邮箱 -->
+                    <div class="form-group">
+                        {{ form.email.label(class="form-control-label") }}
+                        {% if form.email.errors %}
+                            {{ form.email(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.email(class="form-control", placeholder="请输入邮箱") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- 密码（重点修改部分） -->
+                    <div class="form-group">
+                        {{ form.password.label(class="form-control-label") }}
+                        <small class="form-text text-muted">不填写则保持原密码</small>
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid", id="password") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(
+                                class="form-control",
+                                id="password",
+                                placeholder="请输入新密码（不填则保持原密码，需包含大小写字母、数字和特殊字符，长度至少8位）"
+                            ) }}
+                        {% endif %}
+
+                        <!-- 新增：密码强度提示进度条 -->
+                        <div class="mt-2">
+                            <div class="progress" style="height: 5px;">
+                                <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div id="password-feedback" class="small mt-1"></div>
+                        </div>
+
+                        <!-- 新增：密码要求说明 -->
+                        <div class="mt-2 text-muted small">
+                            <p class="mb-1">密码要求：</p>
+                            <ul class="mb-0">
+                                <li>至少8个字符</li>
+                                <li>包含大写字母</li>
+                                <li>包含小写字母</li>
+                                <li>包含数字</li>
+                                <li>包含特殊字符 (!@#$%^&* 等)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 确认密码（优化提示） -->
+                    <div class="form-group">
+                        {{ form.password2.label(class="form-control-label") }}
+                        {% if form.password2.errors %}
+                            {{ form.password2(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password2.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password2(
+                                class="form-control",
+                                placeholder="请重复新密码（若不修改密码，此项可留空）"
+                            ) }}
+                        {% endif %}
+                    </div>
+
+                    <!-- 管理员权限 -->
+                    <div class="form-check">
+                        {% if user.username == 'admin' %}
+                            {{ form.is_admin(class="form-check-input", checked=True, onclick="return false;") }}
+                            <label class="form-check-label" for="is_admin">管理员（不可修改）</label>
+                        {% else %}
+                            {{ form.is_admin(class="form-check-input") }}
+                            {{ form.is_admin.label(class="form-check-label") }}
+                        {% endif %}
+                    </div>
+                    <br>
+
+                    <!-- 提交按钮 -->
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary btn-block", value="保存修改") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}  <!-- 先加载base.html中的jQuery、Bootstrap、侧边栏JS -->
+    <!-- 密码强度检测脚本 -->
+    <script>
+        <!-- 密码强度检测脚本（复用create_user.html的逻辑） -->
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    const strengthBar = document.getElementById('password-strength');
+                    const feedback = document.getElementById('password-feedback');
+
+                    // 密码为空时清空提示
+                    if (!password) {
+                        strengthBar.style.width = '0%';
+                        feedback.textContent = '';
+                        return;
+                    }
+
+                    let strength = 0;
+                    let messages = [];
+
+                    // 检查长度
+                    if (password.length >= 8) {
+                        strength += 20;
+                    } else {
+                        messages.push('长度至少8位');
+                    }
+
+                    // 检查大写字母
+                    if (/[A-Z]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少大写字母');
+                    }
+
+                    // 检查小写字母
+                    if (/[a-z]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少小写字母');
+                    }
+
+                    // 检查数字
+                    if (/[0-9]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少数字');
+                    }
+
+                    // 检查特殊字符
+                    if (/[^A-Za-z0-9]/.test(password)) {
+                        strength += 20;
+                    } else {
+                        messages.push('缺少特殊字符');
+                    }
+
+                    // 更新进度条
+                    strengthBar.style.width = strength + '%';
+
+                    // 设置颜色和提示文本
+                    if (strength < 40) {
+                        strengthBar.className = 'progress-bar bg-danger';
+                        feedback.textContent = '密码强度：弱';
+                        feedback.className = 'small mt-1 text-danger';
+                    } else if (strength < 80) {
+                        strengthBar.className = 'progress-bar bg-warning';
+                        feedback.textContent = '密码强度：中';
+                        feedback.className = 'small mt-1 text-warning';
+                    } else {
+                        strengthBar.className = 'progress-bar bg-success';
+                        feedback.textContent = '密码强度：强';
+                        feedback.className = 'small mt-1 text-success';
+                    }
+
+                    // 显示缺失项
+                    if (strength < 100) {
+                        feedback.textContent += ' - ' + messages.join(', ');
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,177 @@
+/* 容器整体样式 */
+.update-client-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* 更新卡片样式 */
+.update-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    padding: 24px;
+}
+
+/* 卡片标题 */
+.update-card__title {
+    font-size: 18px;
+    color: #1e293b;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+}
+
+/* 操作区域（下拉框+按钮） */
+.update-card__operate {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* 下拉框包裹层 */
+.select-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 下拉框标签 */
+.select-label {
+    margin-right: 8px;
+    font-size: 14px;
+    color: #334155;
+    white-space: nowrap;
+}
+
+/* 下拉选择框 */
+.update-select {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+    color: #1e293b;
+    background-color: #ffffff;
+    min-width: 180px;
+    appearance: none; /* 去除默认下拉箭头样式，可选 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M10.84 1.16L6 6 1.16 1.16A1 1 0 00-0.16 2.84l6 6a1 1 0 001.32 0l6-6a1 1 0 10-1.32-1.68z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px; /* 给自定义箭头留空间 */
+}
+
+/* 下拉框聚焦样式（提升交互体验） */
+.update-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* 更新按钮 */
+.update-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    background-color: #3b82f6;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+/* 按钮 hover/active 状态 */
+.update-btn:hover {
+    background-color: #2563eb;
+}
+
+.update-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* 状态提示区域 */
+.update-card__status {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #f8fafc;
+}
+
+/* 状态文字不同样式 */
+.update-card__status.status-loading {
+    color: #0284c7;
+    background-color: #eff6ff;
+}
+
+.update-card__status.status-completed {
+    color: #059669;
+    background-color: #ecfdf5;
+}
+
+.update-card__status.status-error {
+    color: #dc2626;
+    background-color: #fef2f2;
+}
+
+/* 日志容器 */
+.update-card__log {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-y: auto;
+    background-color: #ffffff;
+    font-family: "Consolas", "Monaco", monospace;
+}
+
+/* 日志行样式 */
+.log-line {
+    margin-bottom: 4px;
+}
+
+.log-line-log-line-output {
+    color: #1e293b;
+}
+
+.log-line-log-line-success {
+    color: #059669;
+}
+
+.log-line-log-line-error {
+    color: #dc2626;
+}
+
+.log-line-log-line-heartbeat {
+    color: #64748b;
+    font-style: italic;
+}
+
+/* 响应式适配（可选，提升移动端体验） */
+@media (max-width: 768px) {
+    .update-card__operate {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .select-wrapper {
+        width: 100%;
+    }
+
+    .update-select {
+        width: 100%;
+    }
+
+    .update-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

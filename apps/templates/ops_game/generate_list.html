@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-operation">
+    <div class="container-fluid">
+        <h2 style="text-align: center;">要创建的游戏服列表选择</h2>
+        <h5>渠道选择支持 全部 | 多选(按住Ctrl进行多选) | 单选)</h5>
+        <h5>区服类型选择支持 全部 | 多选(按住Ctrl进行多选) | 单选)</h5>
+
+        <!-- 更新方式下拉框 -->
+        <div class="selection-group" style="margin-bottom: 15px;">
+            <label for="update_mode">更新方式：</label>
+            <select id="update_mode" class="sync-select">
+                <option value="">请选择更新方式</option>
+                <option value="reload">热更</option>
+                <option value="update">停服更新</option>
+            </select>
+            <span id="update_mode_tip" style="color: red; margin-left: 10px; display: none;">请选择更新方式</span>
+        </div>
+
+        <div class="selection-group">
+            <label for="channel_name">渠道：</label>
+            <select id="channel_name" class="multiple-choice" multiple size="6" onchange="loadServerTypes()">
+                <option value="" data-all="true">&lt;全部&gt;</option>
+            </select>
+
+            <label for="server_type">游戏服类型：</label>
+            <!-- 区服类型改为多选，参考渠道多选逻辑 -->
+            <select id="server_type" class="multiple-choice" multiple size="6" onchange="loadGameNumbers()" disabled>
+                <option value="" data-all="true">&lt;全部&gt;</option>
+            </select>
+        </div>
+
+        <div class="selection-group" style="margin-top: 10px;">
+            <label for="game_nu" style="display: inline-block; vertical-align: top; margin-top: 5px;">区服范围：</label>
+            <div style="display: inline-block; margin-left: 5px; width: calc(100% - 80px);">
+                <input type="text" id="game_nu"
+                       placeholder="多区服输入，结尾用英文逗号隔开，如: 1_6,9,12,13_16,"
+                       disabled
+                       style="width: 100%; box-sizing: border-box; padding: 4px 6px;">
+                <span id="game_range" class="range-info" style="display: block; margin-top: 3px;"></span>
+            </div>
+        </div>
+
+        <br>
+        <button onclick="submitSelection()">提交</button>
+        <div id="result" class="terminal-output"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/common_ops_game.js') }}"></script>
+<script>
+    window.onload = loadChannels;
+</script>
+{% endblock %}

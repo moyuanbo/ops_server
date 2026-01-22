@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>运维控制台</h1>
+    <span class="text-muted d-none d-sm-inline">欢迎回来，{{ current_user.real_name }}！</span>
+    <span class="text-muted d-inline d-sm-none">欢迎，{{ current_user.username }}！</span>
+</div>
+
+<!-- 统计卡片区域 - 响应式调整 -->
+<div class="row mb-6 g-4">
+    <div class="col-12 col-md-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">总用户数</h5>
+                <h2 class="display-4">{{ total_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.user_list') }}" class="text-white">查看所有用户</a>
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">管理员数</h5>
+                <h2 class="display-4">{{ admin_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.user_list') }}" class="text-white">管理管理员</a>
+                <i class="fas fa-user-shield"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">普通用户数</h5>
+                <h2 class="display-4">{{ normal_users }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('admin.user_list') }}" class="text-white">管理普通用户</a>
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}  <!-- 先加载base.html中的jQuery、Bootstrap、侧边栏JS -->
+{% endblock %}

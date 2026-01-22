@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库错误 - {{ config.get('SITE_NAME', '用户管理系统') }}</title>
+    <!-- 引入必要样式 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 下载本地https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <style>
+        /* 全屏布局核心样式 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .error-container {
+            flex: 1;
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            padding: 20px;
+        }
+        .error-card {
+            width: 100%;
+            max-width: 800px; /* 限制最大宽度 */
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .error-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .error-body {
+            padding: 30px;
+            background-color: white;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 移除复杂导航栏，仅保留极简返回入口（可选） -->
+    <nav class="navbar navbar-dark bg-primary py-2">
+        <div class="container text-center">
+            <a class="navbar-brand mx-auto" href="{{ url_for('index') if 'index' in url_for else '/' }}">
+                {{ config.get('SITE_NAME', '用户管理系统') }}
+            </a>
+        </div>
+    </nav>
+
+    <!-- 错误内容区（全屏居中） -->
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-header">
+                <h1><i class="fa fa-database"></i> 数据库错误</h1>
+                <p>系统遇到数据库连接或操作问题</p>
+            </div>
+            <div class="error-body">
+                <!-- 错误信息和建议操作（保留原内容） -->
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">操作失败</h4>
+                    <p>{{ error_message or '数据库操作过程中发生未知错误' }}</p>
+                </div>
+
+                {% if config['DEBUG'] %}
+                    <div class="error-details">
+                        <!-- 调试信息（仅开发环境显示） -->
+                    </div>
+                {% endif %}
+
+                <div class="suggestion-list">
+                    <!-- 建议操作（保留原内容） -->
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="javascript:history.back()" class="btn btn-primary me-3">
+                        <i class="fa fa-arrow-left"></i> 返回上一页
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fa fa-home"></i> 返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        <div class="container">
+            <p>&copy; {{ now.year if now else 2024 }} {{ config.get('SITE_NAME') }} - 版权所有</p>
+        </div>
+    </div>
+
+    <!-- 必要JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 保留自动刷新逻辑（如果需要）
+    </script>
+</body>
+</html>

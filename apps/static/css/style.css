@@ -1,0 +1,590 @@
+/* ========================
+   全局样式
+   ======================== */
+
+/* 重置全局默认样式，避免干扰 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* 禁止页面整体滚动，仅主内容区滚动 */
+}
+
+/* 动态获取顶部导航栏高度，注入CSS变量 */
+:root {
+    --navbar-height: 0; /* 由JS动态赋值 */
+}
+
+/* 确保导航栏高度计算准确（如果导航栏是fixed定位） */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100; /* 确保在主内容区上方 */
+    /* 移除可能导致高度偏差的多余margin/padding */
+    margin: 0;
+    padding: 0.5rem 1rem; /* 按需调整，避免用固定height */
+    box-sizing: border-box;
+    /* 添加背景色（与侧边栏保持风格一致） */
+    background-color: #2d3748;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa; /* 与主内容区背景匹配 */
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column; /* 垂直排列：顶部导航 -> 内容区 -> 底部 */
+    /* 如果导航栏是static/relative，用padding-top替代margin-top */
+    padding-top: var(--navbar-height);
+}
+
+.container {
+    max-width: 1200px;
+}
+
+a {
+    color: #007bff;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+/* ========================
+   导航栏样式
+   ======================== */
+
+/* 导航栏样式优化，去除多余阴影和边框 */
+.navbar {
+    /* 移除默认阴影，避免视觉上的"多栏"感 */
+    box-shadow: none;
+    /* 可选：添加细边框增强层次感 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* 确保底部无间距，与内容区无缝衔接 */
+    margin-bottom: 0 !important;
+    /* 顶部导航栏固定高度，避免挤压内容 */
+    flex-shrink: 0;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #fff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border-radius: 4px;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================
+   卡片组件样式
+   ======================== */
+
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 1rem 1.25rem;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* ========================
+   表单样式
+   ======================== */
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+/* ========================
+   按钮样式
+   ======================== */
+
+.btn {
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+/* ========================
+   表格样式
+   ======================== */
+
+.table {
+    width: 100%;
+    min-width: 100%; /* 固定表格宽度，避免拉伸 */
+    table-layout: fixed; /* 固定表格布局算法，加速渲染 */
+    border-collapse: collapse; /* 合并边框，减少布局冲突 */
+}
+
+.table th,
+.table td {
+    min-width: 80px; /* 根据实际需求调整，固定表头最小宽度 */
+    width: auto;
+    white-space: nowrap; /* 表头文字不换行，保持宽度稳定 */
+    /* 处理内容溢出 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.75rem; /* 增加内边距，避免内容贴边 */
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 500;
+    color: #212529;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ========================
+   页面标题和间距
+   ======================== */
+
+h1, h2, h3, h4, h5, h6 {
+    color: #212529;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* ========================
+   响应式样式调整
+   ======================== */
+
+@media (max-width: 768px) {
+    .navbar-dark .navbar-nav .nav-link {
+        margin-left: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .btn-group {
+        display: block;
+    }
+
+    .card-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    .card-footer a {
+        width: 100%;
+    }
+    .display-4 {
+        font-size: 1.8rem;
+    }
+
+    /* 响应式调整：小屏幕下表格区域更紧凑 */
+    .table-container {
+        padding-bottom: 0.5rem;
+    }
+    .table {
+        min-height: 200px;
+    }
+    .sidebar.expanded-on-mobile + .main-content {
+        margin-left: 220px !important;
+        width: calc(100% - 220px) !important;
+    }
+    /* 小屏幕下默认隐藏侧边栏，通过按钮控制显示 */
+    .sidebar {
+        position: fixed;
+        height: calc(100vh - var(--navbar-height));
+        transform: translateX(-100%);
+        z-index: 1000;
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* 响应式调整 */
+    .main-content {
+        width: 100% !important; /* 小屏强制全屏宽度 */
+    }
+
+    /* 增加侧边栏遮罩层 */
+    .sidebar-backdrop {
+        position: fixed;
+        top: var(--navbar-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+
+    /* 修复小屏幕下的布局冲突 */
+    .sidebar + .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* ========================
+   自定义组件
+   ======================== */
+
+/* Dashboard Stats Cards */
+.card-stat {
+    color: white;
+}
+
+.card-stat .card-body {
+    padding: 1.5rem;
+}
+
+.card-stat .display-4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.card-stat .card-footer {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-top: none;
+}
+
+.card-stat .card-footer a {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Alert */
+.alert {
+    border-radius: 6px;
+    border: none;
+}
+
+/* 页面标题区域与导航栏的间距调整 */
+.d-flex.justify-content-between.align-items-center.mb-4 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef; /* 可选：添加底部边框，区分标题与内容 */
+    margin-bottom: 1.5rem !important;
+}
+
+/* 主内容容器填充剩余空间 */
+.app-container {
+    flex: 1;
+    display: flex;
+    /* 关键：用动态导航栏高度计算，避免溢出 */
+    min-height: calc(100vh - var(--navbar-height));
+    height: calc(100vh - 56px); /* 强制固定高度，禁止动态拉伸 */
+    /*overflow: hidden; !* 隐藏外层滚动，避免整体滚动导致的抖动 *!*/
+    /* 顶部留出导航栏空间（如果导航栏是fixed定位） */
+    margin-top: 0;
+}
+
+/* 表格容器优化：确保内容不被挤压 */
+.table-container {
+    min-height: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* 底部区域仅在有内容时显示，无内容时不占位 */
+.footer {
+    flex-shrink: 0;
+    margin-top: auto; /* 有内容时自动推到底部 */
+    padding: 1rem 0;
+    display: none; /* 默认隐藏无内容的底部 */
+}
+
+/* 当底部有内容时，通过添加类显示 */
+.footer.has-content {
+    display: block;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* 优化表格与父容器的间距 */
+.table-responsive {
+    margin-bottom: 0; /* 移除表格容器默认底部间距 */
+}
+
+/* 强化侧边栏稳定性，避免联动抖动 */
+.sidebar {
+    width: 220px;   /* 展开宽度 */
+    flex-shrink: 0; /* 禁止收缩，确保宽度固定 */
+    background-color: #2d3748;
+    color: #fff;
+    position: relative; /* 避免层级冲突 */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    border-right: 1px solid #4a5568; /* 添加右侧边框增强分隔感 */
+    margin-top: 0; /* 确保顶部无间距 */
+    will-change: width;
+    backface-visibility: hidden;
+    z-index: 20; /* 确保侧边栏层级高于主内容区 */
+    overflow: hidden; /* 隐藏内部溢出 */
+}
+
+/* 折叠状态样式：缩窄宽度 + 隐藏文本 */
+.sidebar.collapsed {
+    width: 60px; /* 折叠后宽度（仅显示图标） */
+}
+
+/* 侧边栏头部 */
+.sidebar-header {
+    padding: 1rem;
+    display: flex;
+    border-bottom: 1px solid #4a5568; /* 添加底部边框与内容区分 */
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #4a5568;
+}
+
+.sidebar-logo {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+}
+
+.sidebar-toggle {
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* 菜单分组样式 */
+.menu-group {
+    margin: 1rem 0;
+}
+
+.menu-group-title {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #a0aec0;
+    letter-spacing: 1px;
+}
+
+.menu-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    margin: 0;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #e2e8f0;
+    text-decoration: none;
+    transition: all 0.3s ease; /* 统一过渡所有属性，包括布局相关 */
+}
+
+.menu-item a i {
+    margin-right: 0.75rem; /* 图标与文本间距 */
+    width: 16px; /* 固定图标宽度，避免抖动 */
+    text-align: center;
+}
+
+/* 折叠后移除图标右侧间距 */
+.sidebar.collapsed .menu-item a i {
+    min-width: 16px; /* 固定图标最小宽度，避免抖动 */
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background-color: #4a5568;
+    color: #fff;
+}
+
+/* 折叠状态隐藏文字 */
+.sidebar.collapsed .sidebar-logo-text,
+.sidebar.collapsed .menu-text,
+.sidebar.collapsed .sidebar-logo span,
+.sidebar.collapsed .menu-group-title,
+.sidebar.collapsed .username {
+    display: none !important; /* 强制隐藏 */
+}
+
+/* 折叠后调整内边距，避免图标偏移 */
+.sidebar.collapsed .sidebar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.sidebar.collapsed .menu-item a {
+    justify-content: center; /* 图标居中 */
+    padding: 0.75rem 0;
+}
+
+/* 保持原有菜单样式兼容 */
+.sidebar-menu {
+    padding: 1rem 0;
+}
+
+.user-actions a {
+    color: #e2e8f0;
+    transition: color 0.2s;
+    font-size: 1.1rem;
+}
+
+.user-actions a:hover {
+    color: #fff;
+}
+
+/* 主内容区样式 */
+.main-content {
+    flex: 1;
+    /* 仅在有侧边栏时应用 */
+    margin-left: 0 !important;
+    /* 同时对margin-left和width添加过渡，确保同步变化 */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    will-change: margin-left, width; /* 提前告知浏览器优化动画 */
+    backface-visibility: hidden;
+    overflow-anchor: none;
+    background-color: #f8f9fa !important;
+    position: relative;
+    z-index: 10;
+    /* 仅在内容溢出时显示滚动条，否则隐藏 */
+    overflow-y: auto;
+    /* 移除默认滚动条预留空间导致的视觉偏移 */
+    scrollbar-gutter: stable both-edges;
+    /* 精确计算高度 */
+    height: calc(100vh - var(--navbar-height));
+    /* 避免padding影响宽度计算 */
+    box-sizing: border-box;
+    transition-property: margin-left, width, padding;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+    width: 100%; /* 确保占满可用宽度 */
+}
+
+/* 侧边栏折叠时，主内容区左边距同步缩小 */
+.sidebar.collapsed + .main-content {
+    margin-left: 60px !important;
+}
+
+/* 解决登录入口的margin冲突 */
+.login-entry {
+    margin-left: 0 !important; /* 覆盖默认的0.5rem左间距 */
+}
+
+/* 确保未登录状态下导航栏右侧无额外内边距 */
+.navbar-dark .navbar-nav {
+    margin-left: 0 !important;
+}
+
+/* 优化容器全屏显示 */
+.navbar > .container-fluid {
+    padding-right: 1rem; /* 保留适当右侧内边距，避免贴紧边缘 */
+    padding-left: 1rem;
+}
+
+/* 仅当侧边栏存在时，才给内容区添加左侧边距 */
+.sidebar + .main-content {
+    margin-left: 220px !important;
+}

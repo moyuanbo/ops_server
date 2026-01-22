@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<!-- 引入服务器管理通用样式 -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/server_manager.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>游戏服列表</h2>
+            <a href="{{ url_for('game_management.add_entity') }}" class="btn btn-primary">
+                <i class="fa fa-plus"></i> 添加游戏服
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>归属渠道</th>
+                                <th>游戏服类型</th>
+                                <th>区服</th>
+                                <th>外网IP</th>
+                                <th>内网IP</th>
+                                <th>开服状态</th>
+                                <th>状态类型</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game_info in game_ls %}
+                            <tr id="server-tr-{{ game_info.id }}">
+                                <!-- 为超长内容添加tooltip和样式 -->
+                                <td class="ellipsis-tooltip" data-content="{{ game_info.channel_name }}">
+                                    {{ game_info.channel_name }}
+                                </td>
+                                <td class="ellipsis-tooltip" data-content="{{ game_info.server_type }}">
+                                    {{ game_info.server_type }}
+                                </td>
+                                <td class="ellipsis-tooltip" data-content="{{ game_info.game_nu }}">
+                                    {{ game_info.game_nu }}
+                                </td>
+                                <td class="ellipsis-tooltip" data-content="{{ game_info.external_ip }}">
+                                    {{ game_info.external_ip }}
+                                </td>
+                                <td class="ellipsis-tooltip" data-content="{{ game_info.intranet_ip }}">
+                                    {{ game_info.intranet_ip }}
+                                </td>
+                                <td>
+                                    {% if game_info.open_status == 0 %}
+                                        <span class="badge badge-secondary">未开服</span>
+                                    {% elif game_info.open_status == 1 %}
+                                        <span class="badge badge-success">已开服</span>
+                                    {% else %}
+                                        <span class="badge badge-dark">状态未知</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if game_info.game_status == 0 %}
+                                        <span class="badge badge-primary" title="正式运营区服">正式服</span>
+                                    {% elif game_info.game_status == 1 %}
+                                        <span class="badge badge-info" title="供测试使用的区服">测试服</span>
+                                    {% elif game_info.game_status == 2 %}
+                                        <span class="badge badge-danger" title="已标记删除的区服">已删除</span>
+                                    {% elif game_info.game_status == 3 %}
+                                        <span class="badge badge-warning" title="未部署的区服">未部署</span>
+                                    {% else %}
+                                        <span class="badge badge-dark" title="未知类型">类型未知</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm user-operation-dropdown">
+                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                data-container="body"
+                                                aria-haspopup="true"
+                                                aria-expanded="false">
+                                            操作
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ url_for('game_management.modify_entity', entity_id=game_info.id) }}">
+                                                <i class="fa fa-pencil text-primary"></i> 编辑
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item text-danger" href="javascript:;" data-id="{{ game_info.id }}" onclick="deleteServer(this)">
+                                                <i class="fa fa-trash"></i> 删除
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="13" class="text-center">暂无游戏服数据</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页控件 -->
+                {% if total_pages > 1 %}
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted">
+                        显示 {{ (current_page-1)*per_page + 1 }} - {{ [current_page*per_page, total_count]|min }} 条，共 {{ total_count }} 条
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-end mb-0">
+                            <!-- 上一页 -->
+                            <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('game_management.entity_list', page=current_page-1) }}" aria-label="上一页">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <!-- 页码 -->
+                            {% for page_num in range(1, total_pages+1) %}
+                                <!-- 只显示当前页前后2页及首尾页，避免页码过多 -->
+                                {% if page_num == 1 or page_num == total_pages or (page_num >= current_page-2 and page_num <= current_page+2) %}
+                                    <li class="page-item {% if page_num == current_page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('game_management.entity_list', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% elif page_num == current_page-3 or page_num == current_page+3 %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- 下一页 -->
+                            <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('game_management.entity_list', page=current_page+1) }}" aria-label="下一页">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+    <script src="{{ url_for('static', filename='js/server_manager.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.server-operation-dropdown .dropdown-toggle').dropdown();
+            // 初始化服务器管理通用逻辑（包括提示框自动关闭）
+            ServerManager.init();  // 调用JS中暴露的初始化函数
+        });
+
+        function deleteServer(el) {
+            const gameId = el.getAttribute('data-id');
+            if (confirm('确定要删除这个游戏服吗？此操作不可恢复！')) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                fetch(`{{ url_for('game_management.delete_entity', entity_id=0) }}`.replace('0', gameId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (response.headers.get('Content-Type').includes('application/json')) {
+                        return response.json();
+                    }
+                    return { success: response.ok, msg: '操作成功' };
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`server-tr-${gameId}`).remove();
+                        alert('游戏服删除成功！');
+                    } else {
+                        alert('游戏服删除失败：' + (data.msg || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('删除失败：', error);
+                    alert('游戏服删除失败，请重试！');
+                });
+            }
+        }
+    </script>
+{% endblock %}

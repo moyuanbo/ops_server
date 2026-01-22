@@ -1,0 +1,45 @@
+<!-- apps/templates/errors/403.html -->
+{% extends "base.html" %}
+
+{% block title %}访问被拒绝 - 403{% endblock %}
+<!-- 重写CSS，隐藏侧边栏和顶部导航 -->
+{% block css %}
+{{ super() }}
+<style>
+    /* 隐藏侧边栏和顶部导航 */
+    .sidebar { display: none !important; }
+    .navbar { display: none !important; }
+    /* 让主内容区全屏 */
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center; /* 垂直居中 */
+    }
+    .container {
+        width: 100%;
+        max-width: 800px; /* 限制最大宽度，避免内容过宽 */
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1 text-danger">403</h1>
+            <h2 class="mb-4">访问被拒绝</h2>
+            <p class="lead">您没有足够的权限来访问此页面。</p>
+            <hr>
+            <p>如果您认为这是一个错误，请联系系统管理员。</p>
+            <a href="{{ url_for('admin.user_profile') }}" class="btn btn-primary mt-4">返回首页</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- 移除不必要的脚本（如侧边栏折叠逻辑） -->
+{% block scripts %}
+<!-- 仅保留基础JS（如Bootstrap必要功能） -->
+<script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+{% endblock %}

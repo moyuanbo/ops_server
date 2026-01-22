@@ -1,0 +1,60 @@
+/* 用户管理页面专用样式 */
+
+/* 表格样式优化 */
+.user-table-container .table {
+    table-layout: auto;
+}
+
+.user-table-container .table td {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 200px;
+    vertical-align: middle;
+    padding: 0.75rem;
+    position: relative;
+}
+
+.user-table-container .table th {
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+/* 操作下拉菜单样式 */
+.user-operation-dropdown .dropdown-menu {
+    z-index: 9999 !important;
+    min-width: 120px;
+}
+
+/* 超长内容提示效果 */
+.ellipsis-tooltip {
+    position: relative;
+}
+
+/* 卡片样式统一 */
+.user-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    overflow: hidden;
+}
+
+.user-card .card-body {
+    padding: 2rem;
+}
+
+/* 状态徽章样式增强 */
+.badge-status {
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    font-weight: 500;
+}
+
+/* 防止遮罩层全屏叠加 */
+.modal-backdrop {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.5 !important; /* 确保遮罩层半透明，不是纯黑 */
+}

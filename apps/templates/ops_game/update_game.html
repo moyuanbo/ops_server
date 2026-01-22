@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-operation">
+    <div class="container-fluid">
+        <!-- 查询功能放在顶部 -->
+        <div class="section">
+            <div class="buttons">
+                <button onclick="queryGameList()">打印要操作的游戏服列表</button>
+            </div>
+            <div id="query_game_list" class="terminal-output"></div>
+        </div>
+
+        <!-- 关闭游戏服 -->
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <button onclick="operateGame('stop', 'stop_game')">关闭游戏服</button>
+                {% else %}
+                    <button disabled title="无管理员权限">关闭游戏服</button>
+                {% endif %}
+            </div>
+            <div id="stop_status" class="status"></div>
+            <div id="stop_game" class="output-box"></div>
+        </div>
+
+        <!-- 同步代码 -->
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <!-- 新增label标签，for属性对应select的id -->
+                    <label for="rsync_mode" class="sync-label">同步类型：</label>
+                    <select id="rsync_mode" class="sync-select">
+                        <option value="update">更新</option>
+                    </select>
+                    <button onclick="handleRsync()">同步代码到服务器</button>
+                {% else %}
+                    <label for="rsync_mode_disabled" class="sync-label">同步类型：</label>
+                    <!-- 非管理员下拉框单独设置id，避免重复 -->
+                    <select id="rsync_mode_disabled" disabled class="sync-select">
+                        <option value="update">更新</option>
+                    </select>
+                    <button disabled title="无管理员权限">同步代码到服务器</button>
+                {% endif %}
+            </div>
+            <div id="rsync_status" class="status"></div>
+            <div id="rsync_game" class="output-box"></div>
+        </div>
+
+        <!-- 更新游戏服 -->
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <button onclick="operateGame('update', 'update_game')">更新游戏服</button>
+                {% else %}
+                    <button disabled title="无管理员权限">更新游戏服</button>
+                {% endif %}
+            </div>
+            <div id="update_status" class="status"></div>
+            <div id="update_game" class="output-box"></div>
+        </div>
+
+        <!-- 启动游戏服 -->
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <button onclick="operateGame('start', 'start_game')">启动游戏服</button>
+                {% else %}
+                    <button disabled title="无管理员权限">启动游戏服</button>
+                {% endif %}
+            </div>
+            <div id="start_status" class="status"></div>
+            <div id="start_game" class="output-box"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/common_ops_game.js') }}"></script>
+{% endblock %}

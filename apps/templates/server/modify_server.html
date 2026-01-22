@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<!-- 引入服务器管理通用样式 -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/server_manager.css') }}">
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+<!-- 引入jQuery（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<!-- 引入Bootstrap JS（如果base.html已引入可省略） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<!-- 引入服务器管理通用JS -->
+<script src="{{ url_for('static', filename='js/server_manager.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0 text-primary">修改服务器</h2>
+        <a href="{{ url_for('server_management.entity_list') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 表单卡片 -->
+    <div class="server-form-container">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    <!-- 添加CSRF令牌字段 -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- 主机名 -->
+                    <div class="form-group row">
+                        <label for="host_name">主机名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="host_name" name="host_name" value="{{ server.host_name }}" required>
+                    </div>
+
+                    <!-- 别名 -->
+                    <div class="form-group row">
+                        <label for="alias_name">别名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="alias_name" name="alias_name" value="{{ server.alias_name }}" required>
+                    </div>
+
+                    <!-- 外网IP -->
+                    <div class="form-group row">
+                        <label for="external_ip">外网IP <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="external_ip" name="external_ip" value="{{ server.external_ip }}" required>
+                    </div>
+
+                    <!-- 内网IP -->
+                    <div class="form-group row">
+                        <label for="intranet_ip">内网IP <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="intranet_ip" name="intranet_ip" value="{{ server.intranet_ip }}" required>
+                    </div>
+
+                    <!-- 归属渠道 -->
+                    <div class="form-group row">
+                        <label for="belong_to_channel">归属渠道 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="belong_to_channel" name="belong_to_channel" value="{{ server.belong_to_channel }}" required>
+                    </div>
+
+                    <!-- 服务器类型 -->
+                    <div class="form-group row">
+                        <label for="server_type">服务器类型 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="server_type" name="server_type" value="{{ server.server_type }}" required>
+                    </div>
+
+                    <!-- 状态 -->
+                    <div class="form-group row">
+                        <label for="opening_up">状态 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="opening_up" name="opening_up" required>
+                            <option value="1" {% if server.opening_up == 1 %}selected{% endif %}>正常</option>
+                            <option value="2" {% if server.opening_up == 2 %}selected{% endif %}>不可用</option>
+                            <option value="3" {% if server.opening_up == 3 %}selected{% endif %}>已退订</option>
+                        </select>
+                    </div>
+
+                    <!-- SSH端口 -->
+                    <div class="form-group row">
+                        <label for="ssh_port">SSH端口 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="{{ server.ssh_port }}" required>
+                    </div>
+
+                    <!-- CPU核数 -->
+                    <div class="form-group row">
+                        <label for="cpu_info">CPU核数 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="cpu_info" name="cpu_info" value="{{ server.cpu_info }}" required>
+                    </div>
+
+                    <!-- 内存(G) -->
+                    <div class="form-group row">
+                        <label for="men_info">内存(G) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="men_info" name="men_info" value="{{ server.men_info }}" required>
+                    </div>
+
+                    <!-- 硬盘(G) -->
+                    <div class="form-group row">
+                        <label for="hard_disk">硬盘(G) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="hard_disk" name="hard_disk" value="{{ server.hard_disk }}" required>
+                    </div>
+
+                    <!-- 服务器系统 -->
+                    <div class="form-group row">
+                        <label for="system_info">服务器系统 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="system_info" name="system_info" value="{{ server.system_info }}" required>
+                    </div>
+
+                    <!-- 局域网 -->
+                    <div class="form-group row">
+                        <label for="external_switch">局域网 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="external_switch" name="external_switch" required>
+                            <option value="0" {% if server.external_switch == 0 %}selected{% endif %}>内网</option>
+                            <option value="1" {% if server.external_switch == 1 %}selected{% endif %}>外网</option>
+                        </select>
+                    </div>
+
+                    <!-- 区服类型选择 -->
+                    <div class="form-group row">
+                        <label for="global_server_type">是否可以做global类型的服务器 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="global_server_type" name="global_server_type" required>
+                            <option value="0" {% if server.global_server_type == 1 %}selected{% endif %}>可以</option>
+                            <option value="1" {% if server.global_server_type == 2 %}selected{% endif %}>不可以</option>
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="play_server_type">是否可以做play类型的服务器 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="play_server_type" name="play_server_type" required>
+                            <option value="0" {% if server.play_server_type == 1 %}selected{% endif %}>可以</option>
+                            <option value="1" {% if server.play_server_type == 2 %}selected{% endif %}>不可以</option>
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="central_server_type">是否可以做central类型的服务器 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="central_server_type" name="central_server_type" required>
+                            <option value="0" {% if server.central_server_type == 1 %}selected{% endif %}>可以</option>
+                            <option value="1" {% if server.central_server_type == 2 %}selected{% endif %}>不可以</option>
+                        </select>
+                    </div>
+
+                    <!-- 按钮区域 -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> 更新服务器
+                        </button>
+                        <a href="{{ url_for('server_management.entity_list') }}" class="btn btn-secondary">
+                            <i class="fa fa-times"></i> 取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 页面标题区域 -->
+<div class="d-flex justify-content-between align-items-center mb-6">
+    <h1>欢迎使用运维管理系统</h1>
+    <span class="text-muted">当前时间: {{ current_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+</div>
+
+<!-- 角色专属内容区域 -->
+{% if current_user.is_admin %}
+    <!-- 管理员首页内容 -->
+    <div class="row mb-6">
+        <!-- 系统概览卡片 -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">系统概览</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- 用户统计 -->
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="p-3 rounded-circle bg-primary text-white mr-3">
+                                    <i class="fas fa-users fa-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">总用户数</div>
+                                    <div class="h4">{{ total_users }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 管理员统计 -->
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="p-3 rounded-circle bg-success text-white mr-3">
+                                    <i class="fas fa-user-shield fa-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">管理员数</div>
+                                    <div class="h4">{{ admin_users }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 锁定用户统计 -->
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="p-3 rounded-circle bg-danger text-white mr-3">
+                                    <i class="fas fa-lock fa-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">锁定用户数</div>
+                                    <div class="h4">{{ locked_users }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 活跃用户统计 -->
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="p-3 rounded-circle bg-info text-white mr-3">
+                                    <i class="fas fa-user-check fa-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">本周活跃用户</div>
+                                    <div class="h4">{{ active_users }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 快速操作卡片 -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">快速操作</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('admin.user_list') }}" class="btn btn-outline-primary btn-block p-4 h-100">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <div>用户管理</div>
+                                <small class="text-muted">查看和管理所有用户</small>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('admin.create_user') }}" class="btn btn-outline-success btn-block p-4 h-100">
+                                <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                <div>创建用户</div>
+                                <small class="text-muted">添加新的系统用户</small>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('admin.user_profile') }}" class="btn btn-outline-secondary btn-block p-4 h-100">
+                                <i class="fas fa-user-circle fa-2x mb-2"></i>
+                                <div>个人中心</div>
+                                <small class="text-muted">查看和编辑个人信息</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <!-- 普通用户首页内容 -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">个人信息</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%">用户名</th>
+                                <td>{{ current_user.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>姓名</th>
+                                <td>{{ current_user.real_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>邮箱</th>
+                                <td>{{ current_user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>账号创建时间</th>
+                                <td>{{ current_user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            <tr>
+                                <th>最后登录时间</th>
+                                <td>
+                                    {% if current_user.last_login %}
+                                        {{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% else %}
+                                        首次登录
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">快速操作</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('admin.user_profile') }}" class="btn btn-primary">
+                            <i class="fas fa-edit mr-2"></i>编辑个人信息
+                        </a>
+                        <a href="{{ url_for('admin.edit_user', user_id=current_user.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-key mr-2"></i>修改密码
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">系统公告</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">欢迎使用运维管理系统，请遵守系统使用规范。</p>
+                    <small class="text-muted">最近更新: 2024-01-01</small>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}  <!-- 先加载base.html中的jQuery、Bootstrap、侧边栏JS -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以添加一些首页交互效果，如卡片悬停动画等
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                    this.style.transition = 'all 0.3s ease';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
+                });
+            });
+        });
+    </script>
+{% endblock %}

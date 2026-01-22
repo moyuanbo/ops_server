@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font_color.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-operation">
+    <div class="container-fluid">
+        <h1 style="text-align: center;">添加游戏服</h1>
+        <div class="selection-group">
+            <label for="channel_name">渠道：</label>
+            <select id="channel_name" onchange="loadAddGameTypes()">
+                <option value="">&lt;请选择渠道&gt;</option>
+            </select>
+
+            <label for="server_type">游戏服类型：</label>
+            <select id="server_type" onchange="loadAddGameMaxGame()" disabled>
+                <option value="">&lt;请选择区服类型&gt;</option>
+            </select>
+        </div>
+
+        <div class="selection-group" style="margin-top: 10px;">
+            <label for="game_nu" style="display: inline-block; vertical-align: top; margin-top: 5px;">添加区服数量：</label>
+            <div style="display: inline-block; margin-left: 5px; width: calc(100% - 80px);">
+                <input type="text" id="game_nu"
+                       placeholder="请输入数量数字正整数"
+                       disabled
+                       style="width: 100%; box-sizing: border-box; padding: 4px 6px;">
+                <span id="game_range" class="range-info" style="display: block; margin-top: 3px;"></span>
+            </div>
+        </div>
+
+        <br>
+        <button onclick="submitAddGame()">提交要部署的新服</button>
+        <div id="result" class="terminal-output"></div>
+        <br>
+        <div class="section">
+            <div class="buttons">
+                <button onclick="queryGameList()">打印要操作的游戏服列表</button>
+            </div>
+            <div id="query_game_list" class="terminal-output"></div>
+        </div>
+
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <button onclick="operateGame('initial', 'initial_game')">部署游戏服</button>
+                {% else %}
+                    <button disabled title="无管理员权限">部署游戏服</button>
+                {% endif %}
+            </div>
+            <div id="initial_status" class="status"></div>
+            <div id="initial_game" class="output-box"></div>
+        </div>
+        <!-- 启动游戏服 -->
+        <div class="section">
+            <div class="buttons">
+                {% if current_user.is_admin %}
+                    <button onclick="operateGame('start', 'start_game')">启动游戏服</button>
+                {% else %}
+                    <button disabled title="无管理员权限">启动游戏服</button>
+                {% endif %}
+            </div>
+            <div id="start_status" class="status"></div>
+            <div id="start_game" class="output-box"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // 加载渠道
+    async function loadAddGameChannels() {
+        try {
+            const res = await fetch('/ops_game/add/api/channel_name_list');
+            if (!res.ok) throw new Error(`HTTP错误: ${res.status}`);
+
+            const channels = await res.json();
+            const sel = document.getElementById('channel_name');
+
+            channels.forEach(channel => {
+                const opt = document.createElement('option');
+                opt.value = channel;
+                opt.textContent = channel;
+                sel.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('加载渠道列表失败:', err);
+            alert(`加载渠道列表失败: ${err.message}`);
+        }
+    }
+    // 游戏服类型
+    async function loadAddGameTypes() {
+        const channelName = document.getElementById('channel_name').value;
+        const serverTypeSel = document.getElementById('server_type');
+        const gameNuSel = document.getElementById('game_nu');
+
+        serverTypeSel.innerHTML = '<option value="test">&lt;请选择区服类型&gt;</option>';
+        gameNuSel.value = '';
+        serverTypeSel.disabled = true;
+        gameNuSel.disabled = true;
+
+        if (!channelName) return;
+
+        try {
+            const res = await fetch(`/ops_game/add/api/game_type_list`);
+            if (!res.ok) throw new Error(`HTTP错误: ${res.status}`);
+
+            const serverTypes = await res.json();
+            serverTypes.forEach(type => {
+                const opt = document.createElement('option');
+                opt.value = type;
+                opt.textContent = type;
+                serverTypeSel.appendChild(opt);
+            });
+            serverTypeSel.disabled = false;
+        } catch (err) {
+            console.error('加载游戏服类型失败:', err);
+            alert(`加载游戏服类型失败: ${err.message}`);
+        }
+    }
+    // 区服数据
+    async function loadAddGameMaxGame() {
+        const channelName = document.getElementById('channel_name').value;
+        const serverType = document.getElementById('server_type').value;
+        const gameNuInput = document.getElementById('game_nu');
+        const gameRangeSpan = document.getElementById('game_range');
+
+        gameNuInput.value = '';
+        gameRangeSpan.textContent = '';
+        gameRangeSpan.dataset.max = '';  // 清空存储的最大值
+        gameNuInput.disabled = true;
+
+        if (!channelName || !serverType) return;
+
+        try {
+            const res = await fetch(`/ops_game/add/api/query_max_game?channel_name=${encodeURIComponent(channelName)}&server_type=${encodeURIComponent(serverType)}`);
+            if (!res.ok) throw new Error(`HTTP错误: ${res.status}`);
+
+            const maxGame = await res.json();  // 直接接收最大值（number或null）
+            gameNuInput.disabled = false;
+
+            if (maxGame === null) {
+                // 无区服时的提示
+                gameRangeSpan.textContent = '该渠道下的区服类型还没有部署区服';
+                gameRangeSpan.dataset.max = '';  // 空字符串表示无最大值
+            } else {
+                // 有区服时显示最大值，并存储到data属性
+                gameRangeSpan.textContent = `最大区服：${maxGame}服`;
+                gameRangeSpan.dataset.max = maxGame;  // 存储原始数值
+            }
+        } catch (err) {
+            console.error('加载区服范围失败:', err);
+            alert(`加载区服范围失败: ${err.message}`);
+            gameRangeSpan.textContent = '加载失败';
+            gameRangeSpan.dataset.max = '';
+        }
+    }
+
+    // 提交选择
+    async function submitAddGame() {
+        const channelName = document.getElementById('channel_name').value;
+        const serverType = document.getElementById('server_type').value;
+        const initNumber = document.getElementById('game_nu').value;
+        const gameRangeSpan = document.getElementById('game_range');
+
+        // 从data属性获取最大值（无区服时为''，转为null）
+        const maxGame = gameRangeSpan.dataset.max || null;
+
+        // 输入验证（保持不变）
+        if (!channelName || !serverType) {
+            alert('请选择渠道和区服类型');
+            return;
+        }
+        if (!initNumber || !/^\d+$/.test(initNumber) || parseInt(initNumber) <= 0) {
+            alert('请输入正整数的添加数量');
+            return;
+        }
+
+        // 提交逻辑（保持不变，maxGame为null时表示无历史区服）
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            const response = await fetch('/ops_game/add/game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    channel_name: channelName,
+                    server_type: serverType,
+                    max_game: maxGame,  // 可能为null（无区服时）
+                    init_number: initNumber
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
+            // 用json()解析响应，而非text()
+            const resultData = await response.json();
+            // 显示返回的message（无论成功/失败）
+            document.getElementById('result').textContent = resultData.message || '操作成功';
+        } catch (err) {
+            console.error('提交选择失败:', err);
+            document.getElementById('result').textContent = `提交失败: ${err.message}`;
+        }
+    }
+    window.onload = loadAddGameChannels;
+</script>
+    <script src="{{ url_for('static', filename='js/common_ops_game.js') }}"></script>
+{% endblock %}

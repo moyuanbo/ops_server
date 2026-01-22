@@ -1,0 +1,161 @@
+/* 服务器管理通用样式 */
+
+/* 修复下拉遮挡问题 */
+.table > tbody > tr > td {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* 表格边框样式 - 为每行每列添加浅色边框 */
+.table {
+    border-collapse: collapse; /* 合并边框，避免双重边框 */
+    width: 100%;
+}
+
+.table th,
+.table td {
+    border: 1px solid #e9ecef; /* 浅色边框（#e9ecef是淡灰色，可根据需要调整） */
+}
+
+/* 表头边框强化（可选，让表头与内容区分更明显） */
+.table thead th {
+    border-bottom: 2px solid #e9ecef; /* 表头底部边框稍粗 */
+}
+
+.server-operation-dropdown .dropdown-menu {
+    z-index: 9999 !important;
+    min-width: 120px;
+}
+
+.card .table-responsive {
+    table-layout: auto; /* 取消固定布局，允许列宽自适应内容 */
+}
+
+/* 解决内容过多导致的文字重叠问题 */
+.card .table {
+    table-layout: auto; /* 取消固定布局，允许列宽自适应内容 */
+}
+
+.card .table td {
+    white-space: normal; /* 允许文字换行 */
+    word-wrap: break-word; /* 长单词强制换行 */
+    max-width: 200px; /* 限制最大宽度，避免单栏过宽 */
+    vertical-align: middle; /* 垂直居中对齐，提升美观度 */
+    padding: 0.75rem; /* 适当增加内边距，避免内容拥挤 */
+}
+
+/* 表头样式优化，保持简洁 */
+.card .table th {
+    white-space: nowrap; /* 表头文字不换行 */
+    min-width: 80px; /* 表头最小宽度，避免过窄 */
+}
+
+/* 超长内容鼠标悬停显示完整信息 */
+.ellipsis-tooltip {
+    position: relative;
+}
+
+.ellipsis-tooltip:hover::after {
+    content: attr(data-content);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 页面整体布局优化 */
+.server-form-container {
+    max-width: 800px; /* 限制表单最大宽度，避免大屏拉伸 */
+    margin: 0 auto; /* 水平居中 */
+    padding: 0 15px; /* 小屏幕左右内边距 */
+}
+
+/* 标题区域样式 */
+.page-header {
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+    padding: 0 15px;
+}
+
+/* 表单行样式 */
+.form-group.row {
+    display: flex;
+    align-items: center; /* 垂直精准居中 */
+    margin-bottom: 1.25rem; /* 增加行间距，提升呼吸感 */
+    min-height: 50px;
+}
+
+.form-group.row label {
+    width: 180px;
+    margin-bottom: 0;
+    font-weight: 500;
+    flex-shrink: 0; /* 标签宽度固定 */
+    color: #333; /* 标签文字加深，提升可读性 */
+}
+
+/* 统一输入框和下拉框样式 */
+.form-group.row .form-control {
+    flex: 1;
+    max-width: calc(100% - 140px);
+    padding: 0.5rem 0.75rem; /* 增加内边距，手感更好 */
+    line-height: 1.5;
+    height: calc(2.5rem + 2px); /* 适度增高控件 */
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* 过渡动画 */
+}
+
+/* 输入框聚焦/悬停效果 */
+.form-group.row .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.form-group.row .form-control:hover {
+    border-color: #b3d7ff;
+}
+
+/* 下拉框特殊优化 */
+.form-group.row select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.75rem center / 16px 16px;
+    padding-right: 2.5rem; /* 预留箭头空间 */
+}
+
+/* 卡片样式优化 */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* 轻微阴影，提升质感 */
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 2rem; /* 增加卡片内边距 */
+}
+
+/* 按钮区域样式 */
+.form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem; /* 按钮之间间距 */
+    align-items: center;
+}
+
+/* 提示框样式增强 */
+.alert {
+    border-radius: 0.375rem;
+}
